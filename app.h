@@ -21,4 +21,6 @@ void createMake(const Settings *someSettings);
 
 void clearMemory(Settings *someSettingsToClear);
 
+char *salloc(const char *someText);
+
 #endif
