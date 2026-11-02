@@ -3,19 +3,20 @@
 
 typedef struct
 {
-    int m_count_cflags;
+    char *m_filepath;
     char *m_compiler;
     char **m_cflags;
     char *m_target;
+    char *m_src_dir;
     char *m_build_dir;
+    int m_count_cflags;
 } Settings;
 
-typedef struct
-{
-    char **m_lines;
-} MakeData;
+void print_menu();
 
-void initialize(Settings *someSettings);
+void initialize_basic(Settings *someSettings);
+
+void set_path(Settings *someSettings, char *aPath);
 
 void createMake(const Settings *someSettings);
 
