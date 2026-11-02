@@ -5,6 +5,7 @@ typedef struct
 {
     char *m_filepath;
     char *m_compiler;
+    char *m_language;
     char **m_cflags;
     char *m_target;
     char *m_src_dir;
@@ -15,6 +16,10 @@ typedef struct
 void print_menu();
 
 void initialize_basic(Settings *someSettings);
+
+void set_compiler(Settings *someSettings, char *aCompiler);
+
+void set_language(Settings *someSettings, char *aLanguage);
 
 void set_path(Settings *someSettings, char *aPath);
 

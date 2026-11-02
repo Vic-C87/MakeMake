@@ -19,6 +19,7 @@ void initialize_basic(Settings *someSettings)
 {
     someSettings->m_filepath = salloc("Makefile");
     someSettings->m_compiler = salloc("gcc ");
+    someSettings->m_language = salloc(".c");
     someSettings->m_count_cflags = 6;
     someSettings->m_cflags = malloc(someSettings->m_count_cflags * sizeof(char*));
     if (someSettings->m_cflags == NULL)
@@ -37,6 +38,62 @@ void initialize_basic(Settings *someSettings)
     someSettings->m_target = salloc("program");
     someSettings->m_src_dir = salloc("");
     someSettings->m_build_dir = salloc("build");
+}
+
+void set_compiler(Settings *someSettings, char *aCompiler)
+{
+    if (strcmp(someSettings->m_compiler, aCompiler) == 0)
+    {
+        printf("Already set at compiler. Nothing changed!\n");
+        return;
+    }
+    else
+    {
+        free(someSettings->m_compiler);
+        salloc(aCompiler);
+        if (strcmp(aCompiler, "gcc") == 0)
+        {
+            free(someSettings->m_compiler);
+            someSettings->m_compiler = salloc("gcc");
+            free(someSettings->m_language);
+            someSettings->m_language = salloc(".c");
+        }
+        else if (strcmp(aCompiler, "g++") == 0)
+        {
+            free(someSettings->m_compiler);
+            someSettings->m_compiler = "g++";
+            free(someSettings->m_language);
+            someSettings->m_language = salloc(".cpp");
+        }
+    }
+}
+
+void set_language(Settings *someSettings, char *aLanguage)
+{
+    if (strcmp(someSettings->m_language, aLanguage) == 0)
+    {
+        printf("Already set at compiler. Nothing changed!\n");
+        return;
+    }
+    else
+    {
+        free(someSettings->m_language);
+        salloc(aLanguage);
+        if (strcmp(aLanguage, "c++") == 0)
+        {
+            free(someSettings->m_compiler);
+            someSettings->m_compiler = "g++";
+            free(someSettings->m_language);
+            someSettings->m_language = salloc(".cpp");
+        }
+        else if (strcmp(aLanguage, "c") == 0)
+        {
+            free(someSettings->m_compiler);
+            someSettings->m_compiler = "gcc";
+            free(someSettings->m_language);
+            someSettings->m_language = salloc(".c");
+        }
+    }
 }
 
 void set_path(Settings *someSettings, char *aPath)
@@ -81,9 +138,9 @@ void createMake(const Settings *someSettings)
     //Variables from Settings
     fprintf(file, "CC := %s\nCFLAGS := %s\nTARGET := %s\nSRC_DIR := %s\nBUILD_DIR := %s\n", someSettings->m_compiler, flags, someSettings->m_target, someSettings->m_src_dir, someSettings->m_build_dir);
     //Variables created, not set by user
-    fprintf(file, "\nSRCS := $(wildcard $(SRC_DIR)*.c)\nOBJS := $(SRCS:$(SRC_DIR)%%.c=$(BUILD_DIR)/%%.o)\nDEPS := $(OBJS:.o=.d)\n\n");
+    fprintf(file, "\nSRCS := $(wildcard $(SRC_DIR)*%s)\nOBJS := $(SRCS:$(SRC_DIR)%%%s=$(BUILD_DIR)/%%.o)\nDEPS := $(OBJS:.o=.d)\n\n", someSettings->m_language, someSettings->m_language);
     //Recipies
-    fprintf(file, "\nall: $(TARGET)\n\n$(TARGET): $(OBJS)\n\t$(CC) $(OBJS) -o $@\n\n$(BUILD_DIR)/%%.o: $(SRC_DIR)%%.c | $(BUILD_DIR)\n\t$(CC) $(CFLAGS) -c $< -o $@\n\n$(BUILD_DIR):\n\tmkdir -p $@\n\n-include $(DEPS)\n\nclean:\n\trm -rf $(BUILD_DIR) $(TARGET)\n\nPHONY: all clean\n");
+    fprintf(file, "\nall: $(TARGET)\n\n$(TARGET): $(OBJS)\n\t$(CC) $(OBJS) -o $@\n\n$(BUILD_DIR)/%%.o: $(SRC_DIR)%%%s | $(BUILD_DIR)\n\t$(CC) $(CFLAGS) -c $< -o $@\n\n$(BUILD_DIR):\n\tmkdir -p $@\n\n-include $(DEPS)\n\nclean:\n\trm -rf $(BUILD_DIR) $(TARGET)\n\nPHONY: all clean\n", someSettings->m_language);
 
     free(flags);
     fclose(file);
