@@ -6,11 +6,12 @@ int main(int argc, char **argv)
 {
     Settings settings;
     int running = 1;
-    int input_status;
     char *compile_flag = "-c";
     char *path_flag = "-p";
     if (argc < 2)
     {
+        int input_status;
+        initialize_basic(&settings);
         int menu_choice;
         while (running)
         {
@@ -30,13 +31,13 @@ int main(int argc, char **argv)
                     printf("case 1\n");
                     break;
                 case 2:
-                    printf("case 2\n");
+                    display_makefile(&settings);
                     break;
                 case 3:
                     printf("case 3\n");
                     break;
                 case 4:
-                    printf("case 4\n");
+                    edit_makefile(&settings);
                     break;
                 case 0:
                     running = 0;
