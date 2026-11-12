@@ -6,6 +6,7 @@ typedef struct
     char *m_filepath;
     char *m_compiler;
     char *m_language;
+    char *m_stdc_v;
     char **m_cflags;
     char **m_ldflags;
     char **m_ldlibs;

@@ -32,7 +32,7 @@ void initialize_basic(Settings *someSettings)
     someSettings->m_filepath = salloc("Makefile");
     someSettings->m_compiler = salloc("gcc ");
     someSettings->m_language = salloc(".c");
-    someSettings->m_count_cflags = 6;
+    someSettings->m_count_cflags = 5;
     someSettings->m_cflags = malloc(someSettings->m_count_cflags * sizeof(char*));
     if (someSettings->m_cflags == NULL)
     {
@@ -43,9 +43,10 @@ void initialize_basic(Settings *someSettings)
     someSettings->m_cflags[0] = salloc("-Wall ");
     someSettings->m_cflags[1] = salloc("-Wextra ");
     someSettings->m_cflags[2] = salloc("-Wpedantic ");
-    someSettings->m_cflags[3] = salloc("-std=c17 ");
-    someSettings->m_cflags[4] = salloc("-MMD ");
-    someSettings->m_cflags[5] = salloc("-MP ");
+    someSettings->m_cflags[3] = salloc("-MMD ");
+    someSettings->m_cflags[4] = salloc("-MP ");
+
+    someSettings->m_stdc_v = salloc("-std=c17 ");
 
     someSettings->m_count_ldflags = 0;
     someSettings->m_ldflags = NULL;
@@ -67,7 +68,7 @@ void display_makefile(Settings *someSettings)
 
     
     //Variables from Settings
-    printf("CC := %s\nCFLAGS := %s\nLDFLAGS := %s\nLDLIBS := %s\nTARGET := %s\nSRC_DIR := %s\nBUILD_DIR := %s\n", someSettings->m_compiler, cFlags, ldFlags, ldLibs,someSettings->m_target, someSettings->m_src_dir, someSettings->m_build_dir);
+    printf("CC := %s\nCFLAGS := %s%s\nLDFLAGS := %s\nLDLIBS := %s\nTARGET := %s\nSRC_DIR := %s\nBUILD_DIR := %s\n", someSettings->m_compiler, cFlags, someSettings->m_stdc_v, ldFlags, ldLibs,someSettings->m_target, someSettings->m_src_dir, someSettings->m_build_dir);
     //Variables created, not set by user
     printf("\nSRCS := $(wildcard $(SRC_DIR)*%s)\nOBJS := $(SRCS:$(SRC_DIR)%%%s=$(BUILD_DIR)%%.o)\nDEPS := $(OBJS:.o=.d)\n\n", someSettings->m_language, someSettings->m_language);
     //Recipies
@@ -134,6 +135,8 @@ void set_compiler(Settings *someSettings, char *aCompiler)
             someSettings->m_compiler = salloc("gcc");
             free(someSettings->m_language);
             someSettings->m_language = salloc(".c");
+            free(someSettings->m_stdc_v);
+            someSettings->m_stdc_v = salloc("-std=c17 ");
         }
         else if (strcmp(aCompiler, "g++") == 0)
         {
@@ -141,6 +144,8 @@ void set_compiler(Settings *someSettings, char *aCompiler)
             someSettings->m_compiler = "g++";
             free(someSettings->m_language);
             someSettings->m_language = salloc(".cpp");
+            free(someSettings->m_stdc_v);
+            someSettings->m_stdc_v = salloc("-std=c++20 ");
         }
     }
 }
@@ -204,7 +209,7 @@ void createMake(const Settings *someSettings)
 
     
     //Variables from Settings
-    fprintf(file, "CC := %s\nCFLAGS := %s\nLDFLAGS := %s\nLDLIBS := %s\nTARGET := %s\nSRC_DIR := %s\nBUILD_DIR := %s\n", someSettings->m_compiler, cFlags, ldFlags, ldLibs,someSettings->m_target, someSettings->m_src_dir, someSettings->m_build_dir);
+    fprintf(file, "CC := %s\nCFLAGS := %s%s\nLDFLAGS := %s\nLDLIBS := %s\nTARGET := %s\nSRC_DIR := %s\nBUILD_DIR := %s\n", someSettings->m_compiler, cFlags, someSettings->m_stdc_v, ldFlags, ldLibs,someSettings->m_target, someSettings->m_src_dir, someSettings->m_build_dir);
     //Variables created, not set by user
     fprintf(file, "\nSRCS := $(wildcard $(SRC_DIR)*%s)\nOBJS := $(SRCS:$(SRC_DIR)%%%s=$(BUILD_DIR)%%.o)\nDEPS := $(OBJS:.o=.d)\n\n", someSettings->m_language, someSettings->m_language);
     //Recipies
